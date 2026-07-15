@@ -3,98 +3,24 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>文件信息提取与排序工具（最终版）</title>
-    <!-- mammoth.js 解析 Word -->
+    <title>文件信息提取与排序工具（按修改时间排序版）</title>
     <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
-    <!-- SheetJS 导出 Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
-            padding: 30px 20px;
-            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: #ffffff;
-            border-radius: 20px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.12);
-            padding: 35px 40px;
-        }
-        h1 {
-            font-size: 28px;
-            color: #1a2b4a;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .subtitle {
-            color: #5d6d7e;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #eef2f7;
-        }
-        .card {
-            background: #f8faff;
-            border-radius: 14px;
-            padding: 20px 24px;
-            margin-bottom: 20px;
-            border: 1px solid #e9edf4;
-            transition: box-shadow 0.2s;
-        }
+        body { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; padding: 30px 20px; font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; }
+        .container { max-width: 1200px; margin: 0 auto; background: #ffffff; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.12); padding: 35px 40px; }
+        h1 { font-size: 28px; color: #1a2b4a; margin-bottom: 8px; display: flex; align-items: center; gap: 10px; }
+        .subtitle { color: #5d6d7e; margin-bottom: 30px; padding-bottom: 15px; border-bottom: 2px solid #eef2f7; }
+        .card { background: #f8faff; border-radius: 14px; padding: 20px 24px; margin-bottom: 20px; border: 1px solid #e9edf4; transition: box-shadow 0.2s; }
         .card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-        .card-header {
-            font-weight: 600;
-            font-size: 16px;
-            color: #2c3e50;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .flex-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            align-items: center;
-        }
-        textarea {
-            width: 100%;
-            min-height: 100px;
-            padding: 12px 16px;
-            border: 1px solid #d1d8e0;
-            border-radius: 10px;
-            font-size: 14px;
-            font-family: inherit;
-            resize: vertical;
-            transition: border 0.2s;
-        }
+        .card-header { font-weight: 600; font-size: 16px; color: #2c3e50; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .flex-row { display: flex; flex-wrap: wrap; gap: 15px; align-items: center; }
+        textarea { width: 100%; min-height: 100px; padding: 12px 16px; border: 1px solid #d1d8e0; border-radius: 10px; font-size: 14px; font-family: inherit; resize: vertical; transition: border 0.2s; }
         textarea:focus { border-color: #4a90e2; outline: none; box-shadow: 0 0 0 3px rgba(74,144,226,0.15); }
-        input[type="file"] {
-            padding: 8px 12px;
-            border: 1px dashed #bdc3c7;
-            border-radius: 8px;
-            width: 100%;
-            cursor: pointer;
-            background: #fafcff;
-        }
+        input[type="file"] { padding: 8px 12px; border: 1px dashed #bdc3c7; border-radius: 8px; width: 100%; cursor: pointer; background: #fafcff; }
         input[type="file"]:hover { border-color: #4a90e2; }
-        .btn {
-            padding: 8px 18px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
+        .btn { padding: 8px 18px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
         .btn-primary { background: #4a90e2; color: #fff; }
         .btn-primary:hover { background: #357abd; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(74,144,226,0.3); }
         .btn-success { background: #27ae60; color: #fff; }
@@ -105,82 +31,35 @@
         .btn-outline:hover { border-color: #4a90e2; color: #4a90e2; }
         .btn-sm { padding: 5px 12px; font-size: 12px; }
         .btn-group { display: flex; gap: 8px; flex-wrap: wrap; }
-        .alert {
-            display: none;
-            padding: 12px 18px;
-            border-radius: 10px;
-            margin: 12px 0;
-            font-size: 14px;
-        }
+        .alert { display: none; padding: 12px 18px; border-radius: 10px; margin: 12px 0; font-size: 14px; }
         .alert-success { background: #d5f5e3; color: #1e8449; border-left: 4px solid #27ae60; }
         .alert-error { background: #fadbd8; color: #c0392b; border-left: 4px solid #e74c3c; }
-        .table-wrapper {
-            overflow-x: auto;
-            margin: 15px 0;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-        }
+        .table-wrapper { overflow-x: auto; margin: 15px 0; border-radius: 12px; border: 1px solid #e2e8f0; }
         table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        thead th {
-            background: #f1f5f9;
-            padding: 12px 14px;
-            text-align: left;
-            font-weight: 600;
-            color: #1a2b4a;
-            border-bottom: 2px solid #d1d8e0;
-            white-space: nowrap;
-            position: sticky;
-            top: 0;
-            z-index: 2;
-        }
-        tbody td {
-            padding: 10px 14px;
-            border-bottom: 1px solid #edf2f7;
-            vertical-align: middle;
-        }
+        thead th { background: #f1f5f9; padding: 12px 14px; text-align: left; font-weight: 600; color: #1a2b4a; border-bottom: 2px solid #d1d8e0; white-space: nowrap; position: sticky; top: 0; z-index: 2; }
+        tbody td { padding: 10px 14px; border-bottom: 1px solid #edf2f7; vertical-align: middle; }
         tbody tr { cursor: grab; transition: background 0.15s; }
         tbody tr:hover { background: #f0f7ff; }
         .index-col { width: 40px; text-align: center; color: #95a5a6; font-weight: 500; }
         .action-col { width: 80px; text-align: center; }
-        .action-col button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 4px 6px;
-            color: #7f8c8d;
-            transition: color 0.2s;
-        }
+        .action-col button { background: none; border: none; cursor: pointer; padding: 4px 6px; color: #7f8c8d; transition: color 0.2s; }
         .action-col button:hover { color: #4a90e2; }
         .move-up::before { content: "▲"; }
         .move-down::before { content: "▼"; }
         .empty-state { text-align: center; padding: 40px 20px; color: #bdc3c7; }
-        .copy-section {
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eef2f7;
-        }
+        .copy-section { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eef2f7; }
         .copy-section h3 { font-size: 16px; margin-bottom: 12px; color: #2c3e50; }
-        .sort-match-area {
-            background: #f4f8ff;
-            border-radius: 12px;
-            padding: 16px 20px;
-            margin-bottom: 20px;
-            border: 1px solid #dde6f5;
-        }
+        .sort-match-area { background: #f4f8ff; border-radius: 12px; padding: 16px 20px; margin-bottom: 20px; border: 1px solid #dde6f5; }
         .sort-match-area label { font-weight: 500; color: #2c3e50; display: block; margin-bottom: 6px; }
         .sort-match-area .hint { font-size: 12px; color: #7f8c8d; margin-bottom: 10px; }
-        @media (max-width: 768px) {
-            .container { padding: 20px; }
-            .flex-row { flex-direction: column; align-items: stretch; }
-        }
+        @media (max-width: 768px) { .container { padding: 20px; } .flex-row { flex-direction: column; align-items: stretch; } }
     </style>
 </head>
 <body>
 <div class="container">
-    <h1>📂 文件信息提取与排序工具 <small>最终版</small></h1>
-    <div class="subtitle">支持上传 Word (.docx) 或粘贴文本，自动提取文件名、大小、MD5；支持手动移动行，支持按模糊名称列表（含通配符*）多匹配并自动按集数排序。</div>
+    <h1>📂 文件信息提取与排序工具 <small>按修改时间排序版</small></h1>
+    <div class="subtitle">支持上传 Word (.docx) 或粘贴文本，自动提取文件名、大小、MD5、修改时间；默认按修改时间从早到晚排，支持手动移动行与模糊列表匹配。</div>
 
-    <!-- 输入区域 -->
     <div class="card">
         <div class="card-header">📥 输入文件信息</div>
         <div class="flex-row" style="margin-bottom: 12px;">
@@ -191,7 +70,7 @@
             <div style="flex:1; text-align:center; color:#95a5a6;">或</div>
             <div style="flex:3;">
                 <label style="font-weight:500; display:block; margin-bottom:4px;">直接粘贴文本</label>
-                <textarea id="rawInput" placeholder="从Word/文本中复制以下格式的内容（多组）：&#10;文件：D:\保全证据专用\《雨霖铃》\柚子-04-4K.mp4&#10;大小：1,429,568,781 字节&#10;MD5：493B7DFB0771CB8E2B830E72453EAE0B&#10;&#10;文件：..."></textarea>
+                <textarea id="rawInput" placeholder="从Word/文本中复制以下格式的内容（多组）：&#10;文件：D:\保全证据专用\《雨霖铃》\柚子-04-4K.mp4&#10;大小：1,429,568,781 字节&#10;修改时间：2026-05-18 12:48:32&#10;MD5：493B7DFB0771CB8E2B830E72453EAE0B&#10;&#10;文件：..."></textarea>
             </div>
         </div>
         <div class="flex-row">
@@ -201,7 +80,6 @@
         <div id="alertMsg" class="alert"></div>
     </div>
 
-    <!-- 排序匹配区域 -->
     <div class="sort-match-area" id="sortMatchArea" style="display:none;">
         <label>📋 按粘贴的列表排序（每行一个模糊名称，支持 * 通配符，空行自动忽略）</label>
         <div class="hint">示例：<code>19******764</code> 会匹配所有以 "19" 开头、"764" 结尾的基本名。匹配到的多个文件将按集数数字从小到大排序后放在一起。</div>
@@ -211,17 +89,15 @@
         </div>
     </div>
 
-    <!-- 结果表格 -->
     <div id="resultArea" style="display:none;">
         <div class="card" style="background:#fff;">
             <div class="card-header" style="justify-content:space-between;">
-                <span>📊 提取结果（共 <span id="rowCount">0</span> 行）</span>
+                <span>📊 提取结果（共 <span id="rowCount">0</span> 行，已按修改时间从早到晚排）</span>
                 <div class="btn-group">
                     <button class="btn btn-sm btn-success" id="downloadExcelBtn">⬇️ 下载 Excel</button>
                 </div>
             </div>
 
-            <!-- 复制区域移到表格上方 -->
             <div class="copy-section">
                 <h3>📋 复制数据到剪贴板（可直接粘贴到 Excel）</h3>
                 <div class="btn-group">
@@ -246,9 +122,7 @@
                             <th style="width:80px;">操作</th>
                         </tr>
                     </thead>
-                    <tbody id="tableBody">
-                        <!-- 动态渲染 -->
-                    </tbody>
+                    <tbody id="tableBody"></tbody>
                 </table>
             </div>
         </div>
@@ -257,7 +131,6 @@
 
 <script>
 (function() {
-    // ---------- DOM 引用 ----------
     const wordFileInput = document.getElementById('wordFileInput');
     const rawInput = document.getElementById('rawInput');
     const parseBtn = document.getElementById('parseBtn');
@@ -277,10 +150,8 @@
     const copyCol4 = document.getElementById('copyCol4');
     const copyCol234 = document.getElementById('copyCol234');
 
-    // ---------- 全局数据 ----------
-    let rowsData = []; // 每个元素: { baseName, episode, sizeText, md5, rawSizeBytes }
+    let rowsData = [];
 
-    // ---------- 工具函数 ----------
     function showAlert(msg, isError = false) {
         alertMsg.textContent = msg;
         alertMsg.style.display = 'block';
@@ -303,10 +174,9 @@
         return '';
     }
 
-    // 【修改】大小转换：MB ≥ 1000 时自动转为 GB
     function formatSize(bytes) {
-        const mb = 1048576; // 1024^2
-        const gb = 1073741824; // 1024^3
+        const mb = 1048576;
+        const gb = 1073741824;
         const mbValue = bytes / mb;
         if (mbValue >= 1000) {
             return (bytes / gb).toFixed(2) + ' GB';
@@ -320,7 +190,7 @@
         return cleaned ? parseInt(cleaned, 10) : 0;
     }
 
-    // ---------- 解析文本 ----------
+    // 解析文本，增加修改时间提取
     function parseText(text) {
         const lines = text.split('\n').map(l => l.trim());
         const records = [];
@@ -330,7 +200,7 @@
             if (!line) continue;
             if (/^文件[：:]/.test(line)) {
                 if (current && current.file) records.push(current);
-                current = { file: '', size: '', md5: '' };
+                current = { file: '', size: '', md5: '', modifyTime: '' };
                 let match = line.match(/^文件[：:]\s*(.+)/);
                 if (match) current.file = match[1].trim();
                 continue;
@@ -339,6 +209,9 @@
             if (/^大小[：:]/.test(line)) {
                 let match = line.match(/^大小[：:]\s*(.+)/);
                 if (match) current.size = match[1].trim();
+            } else if (/^修改时间[：:]/.test(line)) {
+                let match = line.match(/^修改时间[：:]\s*(.+)/);
+                if (match) current.modifyTime = match[1].trim();
             } else if (/^MD5[：:]/.test(line)) {
                 let match = line.match(/^MD5[：:]\s*(.+)/);
                 if (match) current.md5 = match[1].trim();
@@ -359,7 +232,6 @@
         }
     }
 
-    // ---------- 渲染表格 ----------
     function renderTable(data) {
         rowsData = data.map(d => {
             const baseName = getBaseName(d.file);
@@ -370,9 +242,12 @@
                 episode,
                 sizeText: formatSize(rawBytes),
                 md5: d.md5 || '',
-                rawSizeBytes: rawBytes
+                rawSizeBytes: rawBytes,
+                modifyTime: d.modifyTime || ''
             };
         });
+        // 默认按修改时间从早到晚升序排序
+        rowsData.sort((a, b) => new Date(a.modifyTime) - new Date(b.modifyTime));
         rebuildTable();
         resultArea.style.display = 'block';
         sortMatchArea.style.display = 'block';
@@ -399,23 +274,16 @@
             </tr>`;
         });
         tableBody.innerHTML = html;
-        // 绑定上移下移事件
         tableBody.querySelectorAll('.move-up').forEach(btn => {
             btn.addEventListener('click', function() {
                 const idx = parseInt(this.dataset.index);
-                if (idx > 0) {
-                    [rowsData[idx], rowsData[idx-1]] = [rowsData[idx-1], rowsData[idx]];
-                    rebuildTable();
-                }
+                if (idx > 0) { [rowsData[idx], rowsData[idx-1]] = [rowsData[idx-1], rowsData[idx]]; rebuildTable(); }
             });
         });
         tableBody.querySelectorAll('.move-down').forEach(btn => {
             btn.addEventListener('click', function() {
                 const idx = parseInt(this.dataset.index);
-                if (idx < rowsData.length - 1) {
-                    [rowsData[idx], rowsData[idx+1]] = [rowsData[idx+1], rowsData[idx]];
-                    rebuildTable();
-                }
+                if (idx < rowsData.length - 1) { [rowsData[idx], rowsData[idx+1]] = [rowsData[idx+1], rowsData[idx]]; rebuildTable(); }
             });
         });
     }
@@ -425,79 +293,49 @@
         return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     }
 
-    // ---------- 核心修复：模糊匹配排序 ----------
+    // 模糊匹配排序（保持之前逻辑）
     function matchSort(matchLines) {
-        const patterns = matchLines
-            .map(line => line.trim())
-            .filter(line => line !== '');
-
-        if (patterns.length === 0) {
-            showAlert('输入列表为空，请至少输入一个名称。', true);
-            return;
-        }
-        if (rowsData.length === 0) {
-            showAlert('表格数据为空，请先解析文件信息。', true);
-            return;
-        }
-
+        const patterns = matchLines.map(line => line.trim()).filter(line => line !== '');
+        if (patterns.length === 0) { showAlert('输入列表为空，请至少输入一个名称。', true); return; }
+        if (rowsData.length === 0) { showAlert('表格数据为空，请先解析文件信息。', true); return; }
         function extractEpisodeNumber(episode) {
             if (!episode) return 0;
             const match = episode.match(/(\d+)/);
             return match ? parseInt(match[1], 10) : 0;
         }
-
         const newOrder = [];
         const usedIndices = new Set();
-
         for (const pattern of patterns) {
             const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const regexStr = '^' + escaped.replace(/\\\*/g, '.*') + '$';
             const regex = new RegExp(regexStr, 'i');
-
             const matchedIndices = [];
             for (let i = 0; i < rowsData.length; i++) {
                 if (usedIndices.has(i)) continue;
-                if (regex.test(rowsData[i].baseName)) {
-                    matchedIndices.push(i);
-                }
+                if (regex.test(rowsData[i].baseName)) matchedIndices.push(i);
             }
-
             if (matchedIndices.length === 0) {
                 const subPattern = pattern.replace(/\*/g, '');
                 if (subPattern) {
                     for (let i = 0; i < rowsData.length; i++) {
                         if (usedIndices.has(i)) continue;
-                        if (rowsData[i].baseName.toLowerCase().includes(subPattern.toLowerCase())) {
-                            matchedIndices.push(i);
-                        }
+                        if (rowsData[i].baseName.toLowerCase().includes(subPattern.toLowerCase())) matchedIndices.push(i);
                     }
                 }
             }
-
             matchedIndices.sort((a, b) => {
                 const epA = extractEpisodeNumber(rowsData[a].episode);
                 const epB = extractEpisodeNumber(rowsData[b].episode);
                 return epA - epB;
             });
-
-            for (const idx of matchedIndices) {
-                newOrder.push(idx);
-                usedIndices.add(idx);
-            }
+            for (const idx of matchedIndices) { newOrder.push(idx); usedIndices.add(idx); }
         }
-
-        for (let i = 0; i < rowsData.length; i++) {
-            if (!usedIndices.has(i)) {
-                newOrder.push(i);
-            }
-        }
-
+        for (let i = 0; i < rowsData.length; i++) { if (!usedIndices.has(i)) newOrder.push(i); }
         rowsData = newOrder.map(idx => rowsData[idx]);
         rebuildTable();
         showAlert(`已按列表排序（支持多匹配+集数排序），共 ${rowsData.length} 行。`);
     }
 
-    // ---------- 复制功能（调整后） ----------
     function getTableText(colIndexes, includeHeader) {
         const header = includeHeader ? ['文件名','集数','大小','MD5'].filter((_,i)=>colIndexes.includes(i)).join('\t') + '\n' : '';
         const rows = rowsData.map(r => {
@@ -509,114 +347,62 @@
 
     function copyToClipboard(text, successMsg) {
         if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).then(() => {
-                showAlert(successMsg || '已复制！');
-            }).catch(() => { fallbackCopy(text); });
+            navigator.clipboard.writeText(text).then(() => { showAlert(successMsg || '已复制！'); }).catch(() => { fallbackCopy(text); });
         } else { fallbackCopy(text); }
         function fallbackCopy(txt) {
             const ta = document.createElement('textarea');
-            ta.value = txt;
-            document.body.appendChild(ta);
-            ta.select();
-            try { document.execCommand('copy'); showAlert('已复制（备用方式）！'); }
-            catch(e) { showAlert('复制失败，请手动复制', true); }
+            ta.value = txt; document.body.appendChild(ta); ta.select();
+            try { document.execCommand('copy'); showAlert('已复制（备用方式）！'); } catch(e) { showAlert('复制失败，请手动复制', true); }
             document.body.removeChild(ta);
         }
     }
 
-    // ---------- 事件绑定 ----------
     parseBtn.addEventListener('click', async () => {
         const wordFile = wordFileInput.files[0];
         const text = rawInput.value.trim();
         let records = [];
-        if (wordFile) {
-            records = await parseWordFile(wordFile);
-        } else if (text) {
-            records = parseText(text);
-        } else {
-            showAlert('请先上传 Word 文件或粘贴文本！', true);
-            return;
-        }
+        if (wordFile) records = await parseWordFile(wordFile);
+        else if (text) records = parseText(text);
+        else { showAlert('请先上传 Word 文件或粘贴文本！', true); return; }
         if (records.length === 0) {
             showAlert('未能解析到任何文件信息，请检查格式。', true);
-            resultArea.style.display = 'none';
-            sortMatchArea.style.display = 'none';
-            return;
+            resultArea.style.display = 'none'; sortMatchArea.style.display = 'none'; return;
         }
         renderTable(records);
-        showAlert(`成功解析 ${records.length} 条记录！`);
+        showAlert(`成功解析 ${records.length} 条记录，已按修改时间排序！`);
     });
 
     clearBtn.addEventListener('click', () => {
-        wordFileInput.value = '';
-        rawInput.value = '';
-        resultArea.style.display = 'none';
-        sortMatchArea.style.display = 'none';
-        rowsData = [];
-        tableBody.innerHTML = '';
-        showAlert('已清空所有数据');
+        wordFileInput.value = ''; rawInput.value = '';
+        resultArea.style.display = 'none'; sortMatchArea.style.display = 'none';
+        rowsData = []; tableBody.innerHTML = ''; showAlert('已清空所有数据');
     });
 
     matchSortBtn.addEventListener('click', () => {
         const text = matchInput.value;
-        if (!text.trim()) {
-            showAlert('请先粘贴列表！', true);
-            return;
-        }
+        if (!text.trim()) { showAlert('请先粘贴列表！', true); return; }
         const lines = text.split('\n');
-        if (lines.length === 0) {
-            showAlert('列表为空', true);
-            return;
-        }
-        if (rowsData.length === 0) {
-            showAlert('表格数据为空，请先解析文件信息。', true);
-            return;
-        }
+        if (rowsData.length === 0) { showAlert('表格数据为空，请先解析文件信息。', true); return; }
         matchSort(lines);
     });
 
     downloadExcelBtn.addEventListener('click', () => {
-        if (rowsData.length === 0) {
-            showAlert('没有数据可下载', true);
-            return;
-        }
+        if (rowsData.length === 0) { showAlert('没有数据可下载', true); return; }
         const wb = XLSX.utils.book_new();
         const wsData = [['文件名','集数','大小','MD5']];
-        rowsData.forEach(r => {
-            wsData.push([r.baseName, r.episode, r.sizeText, r.md5]);
-        });
+        rowsData.forEach(r => { wsData.push([r.baseName, r.episode, r.sizeText, r.md5]); });
         const ws = XLSX.utils.aoa_to_sheet(wsData);
         XLSX.utils.book_append_sheet(wb, ws, '文件信息');
         XLSX.writeFile(wb, '文件信息提取结果.xlsx');
         showAlert('Excel 已下载！');
     });
 
-    // 复制按钮事件（仅保留需要的6个）
-    copyAllBtn.addEventListener('click', () => {
-        const text = getTableText([0,1,2,3], true);
-        copyToClipboard(text, '已复制整表（含表头）');
-    });
-    copyCol1.addEventListener('click', () => {
-        const text = getTableText([0], false);
-        copyToClipboard(text, '已复制第一列（文件名）');
-    });
-    copyCol2.addEventListener('click', () => {
-        const text = getTableText([1], false);
-        copyToClipboard(text, '已复制第二列（集数）');
-    });
-    copyCol3.addEventListener('click', () => {
-        const text = getTableText([2], false);
-        copyToClipboard(text, '已复制第三列（大小）');
-    });
-    copyCol4.addEventListener('click', () => {
-        const text = getTableText([3], false);
-        copyToClipboard(text, '已复制第四列（MD5）');
-    });
-    copyCol234.addEventListener('click', () => {
-        // 复制第二、三、四列：集数、大小、MD5
-        const text = getTableText([1,2,3], false);
-        copyToClipboard(text, '已复制二~四列（集数+大小+MD5）');
-    });
+    copyAllBtn.addEventListener('click', () => { copyToClipboard(getTableText([0,1,2,3], true), '已复制整表（含表头）'); });
+    copyCol1.addEventListener('click', () => { copyToClipboard(getTableText([0], false), '已复制第一列（文件名）'); });
+    copyCol2.addEventListener('click', () => { copyToClipboard(getTableText([1], false), '已复制第二列（集数）'); });
+    copyCol3.addEventListener('click', () => { copyToClipboard(getTableText([2], false), '已复制第三列（大小）'); });
+    copyCol4.addEventListener('click', () => { copyToClipboard(getTableText([3], false), '已复制第四列（MD5）'); });
+    copyCol234.addEventListener('click', () => { copyToClipboard(getTableText([1,2,3], false), '已复制二~四列（集数+大小+MD5）'); });
 
 })();
 </script>
